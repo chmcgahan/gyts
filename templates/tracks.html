@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Your favorite tracks{% endblock %}
+{% block content %}
+	<h2>Your favorite tracks</h2>
+    <ul>
+        {% for track_id, track_info in tracks.items() %}
+            <li>
+                <a href="{{ url_for('download_track', track_id=track_id) }}">
+                    {{ track_info['name'] }} - {{ track_info['artist'] }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

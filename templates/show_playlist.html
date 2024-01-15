@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}PLaylists'songs{% endblock %}
+{% block content %}
+	<h2>Playlists' songs</h2>
+    <ul>
+        {% for track_id, track_info in playlist.items() %}
+            <li>
+                {{ track_info['name'] }} - {{ track_info['artist'] }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

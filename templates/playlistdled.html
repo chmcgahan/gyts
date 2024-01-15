@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Your favorite tracks{% endblock %}
+{% block content %}
+
+    It took {{ elapsed_time }} to finish the job. </br>
+
+    {% if len_dled > 0 %}
+
+        Success downloading these {{ len_dled }} songs!:
+        <ul>
+            {% for track_name, track_artist in tracks_dled.items() %}
+                <li>
+                    {{ track_artist }} - {{ track_name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if len_error > 0 %}
+        ERROR downloading these {{ len_error }} songs:
+        <ul>
+            {% for track_name, track_artist in tracks_error.items() %}
+                <li>
+                    {{ track_artist }} - {{ track_name }}
+                </li>
+            {% endfor %}
+        </ul>    
+    {% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mt-5 mb-4">Get your Tracks Straight</h1>
+    
+    {% if session.token_info %}
+        <p>Hey {{ me }}</p>
+    {% else %}
+        <p>You are not logged in.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Playlists{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="mt-5 mb-4">Your Playlists</h2>
+        <div class="row">
+            {% for playlist_id, playlist_info in playlist.items() %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ playlist_info['name'] }}</h5>
+                            <p class="card-text"><span class="badge badge-primary">{{ playlist_info['tracks_count'] }} songs</span></p>
+                            <a href="{{ url_for('download_playlist', playlist_id=playlist_id) }}" class="btn btn-primary">Download</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
