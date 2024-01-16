@@ -21,6 +21,9 @@ from dl_youtube import download_track_youtube, download_playlist_youtube
 
 import ipdb
 from dotenv import load_dotenv
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
@@ -128,4 +131,5 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=app.config.get('FLASK_DEBUG') == 0, port=10000)
+    logger.info(f"Welcome to GyTS !")
+    app.run(debug=app.config.get('FLASK_DEBUG') == 1, host='0.0.0.0', port=10000)
