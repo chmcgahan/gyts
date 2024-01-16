@@ -39,24 +39,31 @@ SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
 SPOTIPY_CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
 SPOTIPY_REDIRECT_URI = os.getenv("SPOTIPY_REDIRECT_URI")
 
-
 @app.route('/')
 def index():
     cache_handler, auth_manager = get_cache_and_auth_manager()
     
     if request.args.get("code"):
-        # Step 2. Being redirected from Spotify auth page
+        # Redirected from Spotify auth page
         auth_manager.get_access_token(request.args.get("code"))
         return redirect('/')
 
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        # Step 1. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
         return render_template('index.html', auth_url=auth_url)
 
-    # Step 3. Signed in, display data
     spotify = spotipy.Spotify(auth_manager=auth_manager)
     return render_template('index.html', me=spotify.me()['display_name'])
+
+@app.route('/callback')
+def callback():
+    code = request.args.get('code')
+    cache_handler, auth_manager = get_cache_and_auth_manager()
+
+    token_info = auth_manager.get_access_token(code)
+    session['token_info'] = token_info
+
+    return redirect(url_for('index'))
 
 @app.route('/login')
 def login():
@@ -129,6 +136,11 @@ def not_authorized(e):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    print(f"An error occurred: {str(e)}")
+    return "An error occurred", 500
 
 if __name__ == '__main__':
     logger.info(f"Welcome to GyTS !")
