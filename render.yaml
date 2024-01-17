@@ -1,0 +1,4 @@
+services:
+  - name: your-app-name
+    type: web
+    dockerfile: Dockerfile

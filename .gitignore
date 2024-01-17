@@ -1,1 +1,8 @@
 .env
+__pycache__/
+geckodriver.log
+my_venv
+notes.txt
+test.py
+venv_gyts
+.flask_session
