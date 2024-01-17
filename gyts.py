@@ -63,7 +63,7 @@ def callback():
     token_info = auth_manager.get_access_token(code)
     session['token_info'] = token_info
 
-    return redirect(url_for('index'))
+    return redirect('/')
 
 @app.route('/login')
 def login():
