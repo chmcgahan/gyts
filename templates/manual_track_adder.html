@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Download YouTube Playlist{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mt-5 mb-4">Manually Add Your Tracks</h1>
+    <div class="form-group">
+        <input type="text" id="artist" class="form-control mb-2" placeholder="Artist" required>
+        <input type="text" id="title" class="form-control mb-2" placeholder="Title" required>
+        <button type="button" class="btn btn-primary" onclick="addSong()">Add Song</button>
+    </div>
+    <h2 class="mt-4">Current Playlist</h2>
+    <ul id="song-list" class="list-group mb-3"></ul>
+	<hr>
+    <button type="button" class="btn btn-success mt-3" onclick="downloadPlaylist()">Download Playlist</button>
+</div>
+<script>
+    let songs = [];
+
+    function addSong() {
+        const artist = document.getElementById('artist').value;
+        const title = document.getElementById('title').value;
+
+        if (artist && title) {
+            songs.push({ artist, title });
+            document.getElementById('artist').value = '';
+            document.getElementById('title').value = '';
+            displaySongs();
+        } else {
+            alert('Please enter both artist and title.');
+        }
+    }
+
+    function removeSong(index) {
+        songs.splice(index, 1);
+        displaySongs();
+    }
+
+    function displaySongs() {
+        const songList = document.getElementById('song-list');
+        songList.innerHTML = '';
+        songs.forEach((song, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${song.artist} - ${song.title} `;
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.onclick = () => removeSong(index);
+            li.appendChild(removeButton);
+            songList.appendChild(li);
+        });
+    }
+
+    function downloadPlaylist() {
+        fetch('/downloadmanual', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(songs),
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.open();
+            document.write(data);
+            document.close();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+{% endblock %}

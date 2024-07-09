@@ -58,8 +58,7 @@ def download_track_youtube(sp=False, track_id=False, track_artist=False, track_n
 	finally:
 		driver.quit()
 
-def download_playlist_youtube(sp, tracks_dict, playlist_name):
-
+def download_spotify_playlist(sp, tracks_dict, playlist_name):
 	#TODO: multithread to enhance speed
 	tracks_dled = {}
 	tracks_error = {}
@@ -68,6 +67,7 @@ def download_playlist_youtube(sp, tracks_dict, playlist_name):
 
 	start_time = time.time()
 
+
 	for track_id, track_info in tracks_dict.items():
 		try:
 			download_track_youtube(track_artist=track_info.artist, track_name=track_info.name, target_dir=playlist_name)
@@ -75,6 +75,31 @@ def download_playlist_youtube(sp, tracks_dict, playlist_name):
 		except Exception as e:
 			logging.error(f"Error: {str(e)}")
 			tracks_error[track_info.name] = track_info.artist
+	
+	end_time = time.time()
+
+	return render_template('playlistdled.html', 
+						tracks_dled=tracks_dled, tracks_error=tracks_error, 
+						len_dled=len(tracks_dled), len_error=len(tracks_error),
+						elapsed_time = round(end_time - start_time, 2))
+
+def download_manual_playlist(sp, tracks_dict, playlist_name):
+	#TODO: multithread to enhance speed
+	tracks_dled = {}
+	tracks_error = {}
+
+	target_dir = os.path.join(os.path.expanduser("~"), "Downloads", playlist_name)
+
+	start_time = time.time()
+
+
+	for track_id, track_info in tracks_dict.items():
+		try:
+			download_track_youtube(track_artist=track_info['artist'], track_name=track_info['name'], target_dir=playlist_name)
+			tracks_dled[track_info['name']] = track_info['artist']
+		except Exception as e:
+			logging.error(f"Error: {str(e)}")
+			tracks_error[track_info['name']] = track_info['artist']
 	
 	end_time = time.time()
 

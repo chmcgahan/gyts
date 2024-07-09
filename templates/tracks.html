@@ -1,14 +1,93 @@
 {% extends "base.html" %}
-{% block title %}Your favorite tracks{% endblock %}
+{% block title %}Your Favorite Tracks{% endblock %}
 {% block content %}
-	<h2>Your favorite tracks</h2>
-    <ul>
-        {% for track_id, track_info in tracks.items() %}
-            <li>
-                <a href="{{ url_for('download_track', track_id=track_id) }}">
-                    {{ track_info['name'] }} - {{ track_info['artist'] }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Your Favorite Tracks</h2>
+            <ul class="list-group">
+                {% for track_id, track_info in tracks.items() %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ track_info['name'] }} - {{ track_info['artist'] }}</span>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="addToPlaylist('{{ track_info['name'] | urlencode }}', '{{ track_info['artist'] | urlencode }}')">Add to Playlist</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h2>Current Playlist</h2>
+            <ul id="playlist" class="list-group mb-3"></ul>
+            <hr>
+            <button type="button" class="btn btn-success mt-3" onclick="downloadPlaylist()">Download Playlist</button>
+        </div>
+    </div>
+</div>
+<script>
+    let playlist = [];
+
+    function encodeSpecialChars(str) {
+        // List of characters that need to be encoded
+        const specialChars = {
+            '!': '%21',
+            '*': '%2A',
+            "'": '%27',
+            '(': '%28',
+            ')': '%29',
+            '%20': '+', // Preserve spaces as '+'
+            '%': '%25' // Encode '%' character
+        };
+
+        // Replace special characters with their encoded values
+        return str.replace(/[!*'()%]/g, char => specialChars[char] || encodeURIComponent(char));
+    }
+
+
+    function addToPlaylist(name, artist) {
+        playlist.unshift({ name: encodeSpecialChars(name), artist: encodeSpecialChars(artist) });
+        displayPlaylist();
+    }
+
+    function removeFromPlaylist(index) {
+        playlist.splice(index, 1);
+        displayPlaylist();
+    }
+
+    function displayPlaylist() {
+        const playlistElement = document.getElementById('playlist');
+        playlistElement.innerHTML = '';
+        playlist.forEach((track, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${index + 1}. ${track.name} - ${track.artist} `;
+            li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.classList.add('btn', 'btn-danger', 'btn-sm');
+            removeButton.onclick = () => removeFromPlaylist(index);
+            li.appendChild(removeButton);
+            playlistElement.appendChild(li);
+        });
+    }
+
+    function downloadPlaylist() {
+        fetch('/downloadmanual', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(playlist),
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.open();
+            document.write(data);
+            document.close();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Initial display to show the playlist if it's already populated
+    displayPlaylist();
+</script>
 {% endblock %}

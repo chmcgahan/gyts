@@ -17,7 +17,7 @@ from flask_session import Session
 import spotipy
 
 from get_tracks import get_cu_playlists, get_playlist_tracks
-from dl_youtube import download_track_youtube, download_playlist_youtube
+from dl_youtube import download_track_youtube, download_spotify_playlist, download_manual_playlist
 
 import ipdb
 from dotenv import load_dotenv
@@ -54,6 +54,11 @@ def index():
 
     spotify = spotipy.Spotify(auth_manager=auth_manager)
     return render_template('index.html', me=spotify.me()['display_name'])
+
+@app.route('/manual_track_adder')
+def manual_track_adder():
+    #ipdb.set_trace()
+    return render_template('manual_track_adder.html')
 
 @app.route('/callback')
 def callback():
@@ -116,7 +121,18 @@ def download_playlist(playlist_id):
     tracks_dict = get_playlist_tracks(sp, playlist_id=playlist_id)
 
     #TODO: first render the playlist's tracks with a button to download it
-    return download_playlist_youtube(sp, tracks_dict, playlist_name['name'])
+    return download_spotify_playlist(sp, tracks_dict, playlist_name['name'])
+
+@app.route('/downloadmanual', methods=['POST'])
+def download():
+    songs = request.get_json()
+    tracks_dict = {i: {'artist': song['artist'], 'name': song['title']} for i, song in enumerate(songs)}
+    
+    # Dummy Spotify object
+    sp = None
+    playlist_name = "Manual Tracks Added"
+
+    return download_manual_playlist(sp, tracks_dict, playlist_name)
 
 
 def get_cache_and_auth_manager():
